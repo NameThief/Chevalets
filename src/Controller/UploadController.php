@@ -15,6 +15,7 @@ use App\Model\Chevalet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Filesystem\Filesystem;
 use FPDF;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 class UploadController extends AbstractController
@@ -64,12 +65,20 @@ class UploadController extends AbstractController
                             // Ajout du chevalet au PDF en utilisant l'objet $chevaletMaker
                             $chevaletPDFMaker->addChevaletToPDF($pdf, $chevalet);
                         }
+                        // Le reader arrête de lire le fichier excel quand il rencontre une ligne vide
                         else {
                             break;
                         }
                     }
                 }
-                $pdf->Output();
+                // Générer le PDF et le renvoyer en réponse
+                return new StreamedResponse(function () use ($pdf) {
+                    echo $pdf->Output();
+                }, 200, [
+
+                    'Content-Type' => 'application/pdf; charset=utf-8',
+                    'Content-Disposition' => 'attachment; filename="chevalets.pdf"'
+                ]);
             }
         }
         // Renvoyer le PDF en réponse
