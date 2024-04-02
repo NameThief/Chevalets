@@ -3,3 +3,12 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+pdf_generate:
+    path: '/generate-pdf'
+    controller: 'App\Controller\ChevaletController::generatePdf'
+    methods: ['POST']
+testDSFR:
+    path: '/testDSFR'
+    controller: 'App\Controller\DSFRTestController::TEST'
+    methods: ['GET']
+
