@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+{% block body %}
+				<h1>
+			Insérez un fichier
+			</h1>
+
+    <div class="col-2 col-form-label">
+        {{ form_start(form, {'attr': {'autocomplete': 'off'}}) }}
+        <div class="form-group row">{{ form_row(form.fichier) }}</div>
+        {{ form_row(form.document) }}
+        <button type="submit" class="fr-btn">Valider</button>
+        {{ form_end(form) }}</div>
+
+    <a href={{ path('home') }} class="fr-btn">
+        Retour à l'accueil
+    </a>
+{% endblock %}

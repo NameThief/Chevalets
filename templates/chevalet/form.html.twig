@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+{% block title %}Chevalet
+{% endblock %}
+{% block body %}
+	<h1>Formulaire pour Chevalet</h1>
+	<div class="col-2 col-form-label">
+		{{ form_start(form, {'attr': {'autocomplete': 'off'}}) }}
+		<div class="form-group row">{{ form_row(form.nom) }}</div>
+		{{ form_row(form.prenom) }}
+		{{ form_row(form.fonction) }}
+		<button type="submit" class="fr-btn">Générer PDF</button>
+		{{ form_end(form) }}</div>
+
+	<a href={{ path('home') }} class="fr-btn">
+		Retour à l'accueil
+	</a>
+{% endblock %}
