@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use FPDF;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 
-class uploadController extends AbstractController
+class UploadController extends AbstractController
 {
     #[Route('/upload', name: 'upload_page')]
     public function uploadPage(Request $request): Response
