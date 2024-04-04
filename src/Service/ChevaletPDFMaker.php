@@ -16,7 +16,7 @@ class ChevaletPDFMaker
     }
 
     public function getOutput(): string {
-        $this->fpdf->Output();
+        return $this->fpdf->Output('S');
     }
 
     public function addChevaletToPDF(Chevalet $chevalet ): void
