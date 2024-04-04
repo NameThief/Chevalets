@@ -15,7 +15,7 @@ class ChevaletPDFMaker
         $this->fpdf = new FPDF();
     }
 
-    public function getOutput() {
+    public function getOutput(): string {
         $this->fpdf->Output();
     }
 
