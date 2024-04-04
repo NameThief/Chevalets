@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\Emargement;
 use App\Service\ChevaletPDFMaker;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -42,7 +43,7 @@ class UploadController extends AbstractController
 
             if ($data['document'] == 'chevalets') {
                 // Créer un objet de type FPDF
-                $pdf = new FPDF();
+                $pdf = new FPDF('P', 'mm', 'A4');
                 // Créer un objet de type ChevaletPDFMaker
                 $chevaletPDFMaker = new ChevaletPDFMaker();
                 // Charger dans le fichier excel les feuilles "Animateurs" et "Participants"
@@ -59,13 +60,12 @@ class UploadController extends AbstractController
                         // Accédez aux clés uniquement si elles existent
                         if (!empty($row['B']) && !empty($row['C']) && !empty($row['E'])) {
                             $chevalet = new Chevalet();
-                            $chevalet->setNom(mb_convert_encoding($row['B'], "UTF-8", mb_detect_encoding($row['B'])));
-                            $chevalet->setPrenom($row['C']);
-                            $chevalet->setFonction($row['E']);
+                            $chevalet->setNom(($row['B']));
+                            $chevalet->setPrenom(($row['C']));
+                            $chevalet->setFonction(($row['E']));
                             // Ajout du chevalet au PDF en utilisant l'objet $chevaletMaker
                             $chevaletPDFMaker->addChevaletToPDF($pdf, $chevalet);
-                        }
-                        // Le reader arrête de lire le fichier excel quand il rencontre une ligne vide
+                        } // Le reader arrête de lire le fichier excel quand il rencontre une ligne vide
                         else {
                             break;
                         }
@@ -75,19 +75,77 @@ class UploadController extends AbstractController
                 return new StreamedResponse(function () use ($pdf) {
                     echo $pdf->Output();
                 }, 200, [
-
-                    'Content-Type' => 'application/pdf; charset=utf-8',
+                    'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="chevalets.pdf"'
+                ]);
+            } elseif ($data['document'] == 'emargement') {
+                // Chemin vers le fichier Excel
+                $pdf = new FPDF();
+                $excelFilePath = $data['fichier']->getPathname();
+
+                // Charger le fichier Excel
+                $reader = IOFactory::createReader('Xls'); // ou Xlsx selon le format du fichier Excel
+                $spreadsheet = $reader->load($excelFilePath);
+
+                // Accéder aux données des feuilles de calcul "Animateurs" et "Participants"
+                // Supposons que vous extrayez les données des cellules B, C, et E de chaque ligne
+                $sheetNames = ["Animateurs", "Participants", "Informations"];
+                $noms = $prenoms = $fonctions = $titre = $date = $service = $civilites = [];
+
+                foreach ($sheetNames as $sheetName) {
+                    $worksheet = $spreadsheet->getSheetByName($sheetName);
+                    $highestRow = $worksheet->getHighestDataRow();
+
+                    // Extraction des données selon la feuille de calcul
+                    switch ($sheetName) {
+                        case "Animateurs":
+                        case "Participants":
+                            for ($row = 2; $row <= $highestRow; $row++) {
+                                $noms[] = $worksheet->getCell('B' . $row)->getValue();
+                                $prenoms[] = $worksheet->getCell('C' . $row)->getValue();
+                                $fonctions[] = $worksheet->getCell('E' . $row)->getValue();
+                            }
+                            break;
+                        case "Informations":
+                            // Assurez-vous d'ajuster les lettres des colonnes selon la disposition réelle de vos données
+                            $titre[] = $worksheet->getCell('B1')->getValue(); // Première cellule de la plage de données pour les titres
+                            $date[] = $worksheet->getCell('B2')->getValue(); // Première cellule de la plage de données pour les dates
+                            // Vous pouvez également extraire les autres données de la même manière si elles sont dans des cellules uniques
+                            $service[] = $worksheet->getCell('D2')->getValue(); // Exemple de cellule unique pour le service
+                            $civilites[] = $worksheet->getCell('A2')->getValue(); // Exemple de cellule unique pour les civilites
+                            break;
+                        default:
+                            // Ne rien faire pour les autres feuilles de calcul
+                            break;
+                    }
+                }
+
+                // Maintenant, vous pouvez appeler la fonction emargement avec les données extraites
+                $emargement = new Emargement();
+
+                $emargement->setNom(implode(';', $noms));
+                $emargement->setPrenom(implode(';', $prenoms));
+                $emargement->setFonction(implode(';', $fonctions));
+                $emargement->setTitre(implode(';', $titre));
+                $emargement->setDate(implode(';', $date));
+                $emargement->setService(implode(';', $service));
+                $emargement->setCivilite(implode(';', $civilites));
+
+                // Générer le PDF et le renvoyer en réponse
+                return new StreamedResponse(function () use ($pdf) {
+                    echo $pdf->Output();
+                }, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="emargement.pdf"'
                 ]);
             }
         }
-        // Renvoyer le PDF en réponse
 
+        // Renvoyer le formulaire à la vue
         return $this->render('upload/upload.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-
 }
 
 
