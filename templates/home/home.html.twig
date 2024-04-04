@@ -27,7 +27,7 @@
 			<div class="fr-card__body">
 				<div class="fr-card__content">
 					<h3 class="fr-card__title">
-						<a href="{{ path('generate_pdf') }}">Éditeur de Chevalet</a>
+						<a href="{{ path('generate_pdf') }}">Chevalet unique</a>
 					</h3>
 
 					<div class="fr-card__header">
@@ -48,74 +48,20 @@
 			<div class="fr-card__body">
 				<div class="fr-card__content">
 					<h3 class="fr-card__title">
-						<a href="{{ path('upload_page') }}">Chevalets pour réunions</a>
+						<a href="{{ path('upload_page') }}">Boîte à Outils</a>
 					</h3>
 
 					<div class="fr-card__header">
 						<div class="fr-card__img">
 							<img
-							class="fr-responsive-img" src="{{ asset('assets/dsfr/dist/artwork/pictograms/document/document-download.svg') }}" alt="test" style="width: 250px; height: 250px;"/>
+							class="fr-responsive-img" src="{{ asset('assets/dsfr/dist/artwork/pictograms/buildings/factory.svg') }}" alt="test" style="width: 250px; height: 250px;"/>
 						<!-- L’alternative de l’image (attribut alt) doit toujours être présente, sa valeur peut-être vide (image n’apportant pas de sens supplémentaire au contexte) ou non (porteuse de texte ou apportant du sens) selon votre contexte -->
 						</div>
 					</div>
-					<p class="fr-card__desc">Créez plusieurs chevalets en même temps à partir d'un fichier excel.</p>
+					<p class="fr-card__desc">Transformez un document excel avec la liste déroulante.</p>
 				</div>
 			</div>
 		</div>
-	<div class="fr-card ">
-		<div class="fr-card__body">
-			<div class="fr-card__content">
-				<h3 class="fr-card__title">
-					<a href="{{ path('upload_page') }}">Liste d'émargements</a>
-				</h3>
-
-				<div class="fr-card__header">
-					<div class="fr-card__img">
-						<img
-								class="fr-responsive-img" src="{{ asset('assets/dsfr/dist/artwork/pictograms/document/national-identity-card.svg') }}" alt="test" style="width: 250px; height: 250px;"/>
-						<!-- L’alternative de l’image (attribut alt) doit toujours être présente, sa valeur peut-être vide (image n’apportant pas de sens supplémentaire au contexte) ou non (porteuse de texte ou apportant du sens) selon votre contexte -->
-					</div>
-				</div>
-				<p class="fr-card__desc">Créez une liste d'emargement à partir d'un fichier excel.</p>
-			</div>
-		</div>
-	</div>
-	<div class="fr-card ">
-		<div class="fr-card__body">
-			<div class="fr-card__content">
-				<h3 class="fr-card__title">
-					<a href="{{ path('upload_page') }}">Compte rendu</a>
-				</h3>
-
-				<div class="fr-card__header">
-					<div class="fr-card__img">
-						<img
-								class="fr-responsive-img" src="{{ asset('assets/dsfr/dist/artwork/pictograms/document/document-add.svg') }}" alt="test" style="width: 250px; height: 250px;"/>
-						<!-- L’alternative de l’image (attribut alt) doit toujours être présente, sa valeur peut-être vide (image n’apportant pas de sens supplémentaire au contexte) ou non (porteuse de texte ou apportant du sens) selon votre contexte -->
-					</div>
-				</div>
-				<p class="fr-card__desc">Créez un compte-rendu de réunion à partir d'un fichier excel.</p>
-			</div>
-		</div>
-	</div>
-	<div class="fr-card ">
-		<div class="fr-card__body">
-			<div class="fr-card__content">
-				<h3 class="fr-card__title">
-					<a href="{{ path('upload_page') }}">Relevé de conclusion</a>
-				</h3>
-
-				<div class="fr-card__header">
-					<div class="fr-card__img">
-						<img
-								class="fr-responsive-img" src="{{ asset('assets/dsfr/dist/artwork/pictograms/leisure/book.svg') }}" alt="test" style="width: 250px; height: 250px;"/>
-						<!-- L’alternative de l’image (attribut alt) doit toujours être présente, sa valeur peut-être vide (image n’apportant pas de sens supplémentaire au contexte) ou non (porteuse de texte ou apportant du sens) selon votre contexte -->
-					</div>
-				</div>
-				<p class="fr-card__desc">Créez un relevé de conclusion à partir d'un fichier excel.</p>
-			</div>
-		</div>
-	</div>
 </main>{% endblock %}{% block javascripts %}
 <script type="module" href="dsfr/dist/dsfr.module.min.js"></script>
 <script type="text/javascript" nomodule href="{{ asset('assets/dsfr/dist/dsfr.nomodule.min.js') }}"></script>

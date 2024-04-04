@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Model\Emargement;
 use App\Service\ChevaletPDFMaker;
+use App\Service\EmargementPDFMaker;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +38,6 @@ class UploadController extends AbstractController
             $data = $form->getData();
 
             if ($data['document'] == 'chevalets') {
-
 
                 // Créer un objet de type ChevaletPDFMaker
                 $chevaletPDFMaker = new ChevaletPDFMaker();
@@ -74,6 +74,7 @@ class UploadController extends AbstractController
                     'Content-Disposition' => 'attachment; filename="chevalets.pdf"'
                 ]);
             } elseif ($data['document'] == 'emargement') {
+                $emargementPDFMaker = new EmargementPDFMaker();
                 // Chemin vers le fichier Excel
 
                 $excelFilePath = $data['fichier']->getPathname();
@@ -114,7 +115,6 @@ class UploadController extends AbstractController
                             break;
                     }
                 }
-
                 // Maintenant, vous pouvez appeler la fonction emargement avec les données extraites
                 $emargement = new Emargement();
 
@@ -126,9 +126,11 @@ class UploadController extends AbstractController
                 $emargement->setService(implode(';', $service));
                 $emargement->setCivilite(implode(';', $civilites));
 
+                // Appel de la méthode generatePDF avec les données extraites
+                $pdfContent = $emargementPDFMaker->generatePDF($noms, $prenoms, $fonctions, implode(';', $titre), implode(';', $date), $service, $civilites);
                 // Générer le PDF et le renvoyer en réponse
-                return new StreamedResponse(function () use ($pdf) {
-                    echo $pdf->Output();
+                return new StreamedResponse(function () use ($pdfContent) {
+                    echo $pdfContent;
                 }, 200, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="emargement.pdf"'
