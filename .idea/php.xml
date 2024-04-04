@@ -174,7 +174,6 @@
       <path value="$PROJECT_DIR$/vendor/amphp/http" />
       <path value="$PROJECT_DIR$/vendor/clegginabox/pdf-merger" />
       <path value="$PROJECT_DIR$/vendor/setasign/fpdi" />
-      <path value="$PROJECT_DIR$/vendor/tfpdf/font" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">
