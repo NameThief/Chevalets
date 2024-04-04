@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Model\Chevalet;
 use App\Service\ChevaletPDFMaker;
-use FPDF;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,12 +31,10 @@ class ChevaletController extends AbstractController
             // Récupérer les données du formulaire
             $data = $form->getData();
             $chevaletPDFMaker = new ChevaletPDFMaker();
-            $pdf = new Fpdf();
-
-            $chevaletPDFMaker->addChevaletToPDF($pdf,$data);
+            $chevaletPDFMaker->addChevaletToPDF($data);
 
             // Envoyer le PDF en réponse
-            return new Response($pdf->Output(), 200, [
+            return new Response($chevaletPDFMaker->getOutput(), 200, [
                 'Content-Type' => 'application/pdf',
             ]);
         }
