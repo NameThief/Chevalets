@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Model\Emargement;
 use App\Service\ChevaletPDFMaker;
 use App\Service\EmargementPDFMaker;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -86,7 +85,10 @@ class UploadController extends AbstractController
                 // Accéder aux données des feuilles de calcul "Animateurs" et "Participants"
                 // Supposons que vous extrayez les données des cellules B, C, et E de chaque ligne
                 $sheetNames = ["Animateurs", "Participants", "Informations"];
-                $noms = $prenoms = $fonctions = $titre = $date = $service = $civilites = $hfin = $hdebut = [];
+                $titre = $date = $hfin = $hdebut = '';
+                $personnes = [];
+                $personnes['animateurs'] = [];
+                $personnes['participants'] = [];
 
                 foreach ($sheetNames as $sheetName) {
                     $worksheet = $spreadsheet->getSheetByName($sheetName);
@@ -97,35 +99,35 @@ class UploadController extends AbstractController
                     switch ($sheetName) {
 
                         case "Animateurs":
-                            $addEmptyLine = true;
+                            $nbAnimateurs = 0;
                             for ($row = 2; $row <= $highestRow; $row++) {
                             // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
                             if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
-                                $noms[] = $worksheet->getCell('B' . $row)->getValue();
-                                $prenoms[] = $worksheet->getCell('C' . $row)->getValue();
-                                $fonctions[] = $worksheet->getCell('E' . $row)->getValue();
-                                $civilites[] = $worksheet->getCell('A' . $row)->getValue();
-                                $service[] = $worksheet->getCell('D' . $row)->getValue();
+                                $personnes['animateurs'][$nbAnimateurs]['nom'] = $worksheet->getCell('B' . $row)->getValue();
+                                $personnes['animateurs'][$nbAnimateurs]['prenom'] = $worksheet->getCell('C' . $row)->getValue();
+                                $personnes['animateurs'][$nbAnimateurs]['fonction'] = $worksheet->getCell('E' . $row)->getValue();
+                                $personnes['animateurs'][$nbAnimateurs]['civilite'] = $worksheet->getCell('A' . $row)->getValue();
+                                $personnes['animateurs'][$nbAnimateurs]['service'] = $worksheet->getCell('D' . $row)->getValue();
+                                $nbAnimateurs++;
                             }
                         }
-                            break;
-                        case "Participants":
-                            $addEmptyLine = false;
-                            for ($row = 2; $row <= $highestRow; $row++) {
-                            // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
-                            if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
-                                $noms[] = $worksheet->getCell('B' . $row)->getValue();
-                                $prenoms[] = $worksheet->getCell('C' . $row)->getValue();
-                                $fonctions[] = $worksheet->getCell('E' . $row)->getValue();
-                                $civilites[] = $worksheet->getCell('A' . $row)->getValue();
-                                $service[] = $worksheet->getCell('D' . $row)->getValue();
-                            }
-                        }
+                        break;
 
-                            break;
+                        case "Participants":
+                            for ($row = 2; $row <= $highestRow; $row++) {
+                            // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
+                            if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
+                                $personnes['participants']['noms'][] = $worksheet->getCell('B' . $row)->getValue();
+                                $personnes['participants']['prenoms'][] = $worksheet->getCell('C' . $row)->getValue();
+                                $personnes['participants']['fonctions'][] = $worksheet->getCell('E' . $row)->getValue();
+                                $personnes['participants']['civilites'][] = $worksheet->getCell('A' . $row)->getValue();
+                                $personnes['participants']['services'][] = $worksheet->getCell('D' . $row)->getValue();
+                            }
+                        }
+                        break;
+
                         // Déterminer le type en fonction de $sheetName
                         case "Informations":
-                            $addEmptyLine = false;
                             // Assurez-vous d'ajuster les lettres des colonnes selon la disposition réelle de vos données
                             // Vérifier si la cellule B1 contient des données avant d'extraire les titres
                             if (!empty($worksheet->getCell('B1')->getValue())) {
@@ -152,7 +154,7 @@ class UploadController extends AbstractController
                 // Maintenant, vous pouvez appeler la fonction emargement avec les données extraites
 
                 // Appel de la méthode generatePDF avec les données extraites
-                $pdfContent = $emargementPDFMaker->generatePDF($noms, $prenoms, $fonctions, $titre, $date, $service, $civilites, $hdebut, $hfin, $addEmptyLine);
+                $pdfContent = $emargementPDFMaker->generatePDF($personnes, $titre, $date, $hdebut, $hfin);
                 // Générer le PDF et le renvoyer en réponse
                 return new StreamedResponse(function () use ($pdfContent) {
                     echo $pdfContent;
