@@ -13,7 +13,6 @@ class Emargement
     protected string $civilite;
 
 // Les getters et les setters pour les propriétés nom, prenom et fonction sont identiques à ceux de la classe Chevalet
-
     public function getTitre(): string
     {
         return $this->titre;

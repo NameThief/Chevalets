@@ -86,48 +86,73 @@ class UploadController extends AbstractController
                 // Accéder aux données des feuilles de calcul "Animateurs" et "Participants"
                 // Supposons que vous extrayez les données des cellules B, C, et E de chaque ligne
                 $sheetNames = ["Animateurs", "Participants", "Informations"];
-                $noms = $prenoms = $fonctions = $titre = $date = $service = $civilites = [];
+                $noms = $prenoms = $fonctions = $titre = $date = $service = $civilites = $hfin = $hdebut = [];
 
                 foreach ($sheetNames as $sheetName) {
                     $worksheet = $spreadsheet->getSheetByName($sheetName);
                     $highestRow = $worksheet->getHighestDataRow();
 
+
                     // Extraction des données selon la feuille de calcul
                     switch ($sheetName) {
+
                         case "Animateurs":
-                        case "Participants":
+                            $addEmptyLine = true;
                             for ($row = 2; $row <= $highestRow; $row++) {
+                            // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
+                            if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
                                 $noms[] = $worksheet->getCell('B' . $row)->getValue();
                                 $prenoms[] = $worksheet->getCell('C' . $row)->getValue();
                                 $fonctions[] = $worksheet->getCell('E' . $row)->getValue();
+                                $civilites[] = $worksheet->getCell('A' . $row)->getValue();
+                                $service[] = $worksheet->getCell('D' . $row)->getValue();
                             }
+                        }
                             break;
+                        case "Participants":
+                            $addEmptyLine = false;
+                            for ($row = 2; $row <= $highestRow; $row++) {
+                            // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
+                            if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
+                                $noms[] = $worksheet->getCell('B' . $row)->getValue();
+                                $prenoms[] = $worksheet->getCell('C' . $row)->getValue();
+                                $fonctions[] = $worksheet->getCell('E' . $row)->getValue();
+                                $civilites[] = $worksheet->getCell('A' . $row)->getValue();
+                                $service[] = $worksheet->getCell('D' . $row)->getValue();
+                            }
+                        }
+
+                            break;
+                        // Déterminer le type en fonction de $sheetName
                         case "Informations":
+                            $addEmptyLine = false;
                             // Assurez-vous d'ajuster les lettres des colonnes selon la disposition réelle de vos données
-                            $titre[] = $worksheet->getCell('B1')->getValue(); // Première cellule de la plage de données pour les titres
-                            $date[] = $worksheet->getCell('B2')->getValue(); // Première cellule de la plage de données pour les dates
-                            // Vous pouvez également extraire les autres données de la même manière si elles sont dans des cellules uniques
-                            $service[] = $worksheet->getCell('D2')->getValue(); // Exemple de cellule unique pour le service
-                            $civilites[] = $worksheet->getCell('A2')->getValue(); // Exemple de cellule unique pour les civilites
+                            // Vérifier si la cellule B1 contient des données avant d'extraire les titres
+                            if (!empty($worksheet->getCell('B1')->getValue())) {
+                                $titre = $worksheet->getCell('B1' )->getValue(); // Première cellule de la plage de données pour les titres
+                            }
+                            // Vérifier si la cellule B2 contient des données avant d'extraire les dates
+                            if (!empty($worksheet->getCell('B2')->getValue())) {
+                                $date = $worksheet->getCell('B2')->getValue(); // Première cellule de la plage de données pour les dates
+                            }
+                            if (!empty($worksheet->getCell('B3')->getValue())){
+                                $hdebut = $worksheet->getCell('B3')->getValue(); // Première cellule de la plage de données pour l'heure de début
+                            }
+                            if (!empty($worksheet->getCell('B4')->getValue())){
+                                $hfin = $worksheet->getCell('B4')->getValue(); // Première cellule de la plage de données pour l'heure de fin
+                            }
+
                             break;
                         default:
                             // Ne rien faire pour les autres feuilles de calcul
                             break;
                     }
                 }
-                // Maintenant, vous pouvez appeler la fonction emargement avec les données extraites
-                $emargement = new Emargement();
 
-                $emargement->setNom(implode(';', $noms));
-                $emargement->setPrenom(implode(';', $prenoms));
-                $emargement->setFonction(implode(';', $fonctions));
-                $emargement->setTitre(implode(';', $titre));
-                $emargement->setDate(implode(';', $date));
-                $emargement->setService(implode(';', $service));
-                $emargement->setCivilite(implode(';', $civilites));
+                // Maintenant, vous pouvez appeler la fonction emargement avec les données extraites
 
                 // Appel de la méthode generatePDF avec les données extraites
-                $pdfContent = $emargementPDFMaker->generatePDF($noms, $prenoms, $fonctions, implode(';', $titre), implode(';', $date), $service, $civilites);
+                $pdfContent = $emargementPDFMaker->generatePDF($noms, $prenoms, $fonctions, $titre, $date, $service, $civilites, $hdebut, $hfin, $addEmptyLine);
                 // Générer le PDF et le renvoyer en réponse
                 return new StreamedResponse(function () use ($pdfContent) {
                     echo $pdfContent;
