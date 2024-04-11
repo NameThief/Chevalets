@@ -22,8 +22,6 @@ class ChevaletController extends AbstractController
             ->add('prenom', TextType::class)
             ->add('fonction', TextType::class)
             ->getForm();
-        // Créez le formulaire
-//        $form = $this->createForm(ChevaletType::class);
         $form->handleRequest($request);
 
         // Si le formulaire est soumis et valide

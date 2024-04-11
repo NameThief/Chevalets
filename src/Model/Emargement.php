@@ -4,23 +4,21 @@ namespace App\Model;
 
 class Emargement
 {
-    protected string $nom;
-    protected string $prenom;
-    protected string $fonction;
-    protected string $titre;
-    protected string $date;
-    protected string $service;
-    protected string $civilite;
+    private string $objet;
+    private string $date;
+    private string $heureDebut;
+    private string $heureFin;
+    private array $animateurs;
+    private array $participants;
 
-// Les getters et les setters pour les propriétés nom, prenom et fonction sont identiques à ceux de la classe Chevalet
-    public function getTitre(): string
+    public function getObjet(): string
     {
-        return $this->titre;
+        return $this->objet;
     }
 
-    public function setTitre(string $titre): void
+    public function setObjet(string $objet): void
     {
-        $this->titre = $titre;
+        $this->objet = $objet;
     }
 
     public function getDate(): string
@@ -33,53 +31,52 @@ class Emargement
         $this->date = $date;
     }
 
-    public function getService(): string
+    public function getHeureFin(): string
     {
-        return $this->service;
+        return $this->heureFin;
     }
 
-    public function setService(string $service): void
+    public function setHeureFin(string $heureFin): void
     {
-        $this->service = $service;
+        $this->heureFin = $heureFin;
     }
 
-    public function getCivilite(): string
+    public function getHeureDebut(): string
     {
-        return $this->civilite;
+        return $this->heureDebut;
     }
 
-    public function setCivilite(string $civilite): void
+    public function setHeureDebut(string $heureDebut): void
     {
-        $this->civilite = $civilite;
+        $this->heureDebut = $heureDebut;
     }
 
-    public function getFonction(): string
+    public function getAnimateurs(): array
     {
-        return $this->fonction;
+        return $this->animateurs;
     }
 
-    public function setFonction(string $fonction): void
+    public function setAnimateurs(array $animateurs): void
     {
-        $this->fonction = $fonction;
+        $this->animateurs = $animateurs;
     }
 
-    public function setPrenom(string $prenom): void
-    {
-        $this->prenom = $prenom;
+    public function addAnimateur(Personne $personne) {
+        $this->animateurs[] = $personne;
     }
 
-    public function getPrenom(): string
+    public function getParticipants(): array
     {
-        return $this->prenom;
+        return $this->participants;
     }
 
-    public function setNom(string $nom): void
+    public function setParticipants(array $participants): void
     {
-        $this->nom = $nom;
+        $this->participants = $participants;
+    }
+    public function addParticipant(Personne $personne) {
+        $this->participants[] = $personne;
     }
 
-    public function getNom(): string
-    {
-        return $this->nom;
-    }
+
 }

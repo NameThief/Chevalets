@@ -5,7 +5,6 @@ namespace App\Model;
 class Chevalet
 {
     protected string $nom;
-
     protected string $prenom;
 
     protected string $fonction;

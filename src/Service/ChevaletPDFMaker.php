@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Service;
 
 use App\Model\Chevalet;
 use FPDF;
-
 
 class ChevaletPDFMaker
 {
@@ -15,11 +13,12 @@ class ChevaletPDFMaker
         $this->fpdf = new FPDF();
     }
 
-    public function getOutput(): string {
+    public function getOutput(): string
+    {
         return $this->fpdf->Output('S');
     }
 
-    public function addChevaletToPDF(Chevalet $chevalet ): void
+    public function addChevaletToPDF(Chevalet $chevalet): void
     {
         $this->fpdf->AddPage("L");
         $cutPath = "assets/img/cut.gif";
@@ -61,22 +60,22 @@ class ChevaletPDFMaker
         // Nom et prénom en gras
         $this->fpdf->SetFont('Arial', 'B', 36);
 
-// Convertir le prénom en minuscules avec prise en charge UTF-8
+        // Convertir le prénom en minuscules avec prise en charge UTF-8
         $prenom = mb_strtolower($chevalet->getPrenom(), 'UTF-8');
 
-// Convertir le nom en majuscules avec prise en charge UTF-8
+        // Convertir le nom en majuscules avec prise en charge UTF-8
         $nom = mb_strtoupper($chevalet->getNom(), 'UTF-8');
 
-// Concaténer le prénom converti avec le nom
+        // Concaténer le prénom converti avec le nom
         $prenomNom = ucwords($prenom) . ' ' . $nom;
 
         $this->fpdf->Cell(0, 10, mb_convert_encoding($prenomNom, 'ISO-8859-1', 'UTF-8'), 0, 1);
 
-// Fonction en style normal
+        // Fonction en style normal
         $this->fpdf->SetFont('', '', 0, '', true);
         $this->fpdf->SetY($this->fpdf->GetY() + 10); // Espacement vertical
 
-// Convertir la fonction avec prise en charge UTF-8
+        // Convertir la fonction avec prise en charge UTF-8
         $fonction = mb_convert_encoding($chevalet->getFonction(), 'ISO-8859-1', 'UTF-8');
         $this->fpdf->Multicell(190, 10, $fonction);
     }
