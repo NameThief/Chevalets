@@ -45,14 +45,15 @@ class EmargementPDFMaker
         $this->fpdf->Text(80, 34, "Duree : de " . stripslashes($hdebut) . " a " . stripslashes($hfin));
         // Logique pour générer le PDF des listes d'émargements
 
-        $this->fpdf->SetFont('Arial', '', 8);
-        $this->fpdf->Text($c1 + 3, $w - 1, "Fonction");
         $this->fpdf->SetFont('Arial', '', 10);
-        $this->fpdf->Text($c2 + 3, $w - 3, "Emargement");
+        $this->fpdf->Text($c1 + 30, $w - 4, "Animateurs");
+        $this->fpdf->SetFont('Arial', '', 10);
+        $this->fpdf->Text($c2 + 15, $w - 4, "Emargement");
         $this->fpdf->Line($c1, $w, $c3, $w);
         $this->fpdf->Line($c2, $w, $c2, 271);
         $w += 10;
         $nb_page = 1;
+        $this->fpdf->SetFont('Arial', '', 10);
         $this->fpdf->Text($c2 + 3, 285, "Page : " . $nb_page);
 
         $logoPath = "assets/img/logo.jpg";
@@ -69,11 +70,10 @@ class EmargementPDFMaker
         // Ajout du logo
         $this->fpdf->Image($logoPath, 4, 4, 32);
         // Lignes du tableau
-        $this->fpdf->Line($c1, $w, $c1, 271); // Ligne verticale gauche
-        $this->fpdf->Line($c1 + 150, $w, $c1 + 150, 271); // Ligne verticale milieu
-        $this->fpdf->Line($c1 + 200, $w, $c1 + 200, 271); // Ligne verticale droite
-        $this->fpdf->Line($c1, $w, $c1 + 200, $w); // Ligne horizontale du haut
-        $this->fpdf->Line($c1, $w, $c3, $w);
+        $this->fpdf->Line($c1, $w-20, $c1, 271); // Ligne verticale gauche page 1
+        $this->fpdf->Line($c1 + 150, $w-20, $c1 + 150, 271); // Ligne verticale milieu page 1
+        $this->fpdf->Line($c1 + 200, $w-20, $c1 + 200, 271); // Ligne verticale droite page 1
+
 
         foreach ($personnes['animateurs'] as $animateur) {
             $nom = str_replace("\\'", "'", $animateur['nom']); //stripslashes
@@ -82,22 +82,58 @@ class EmargementPDFMaker
             if ($nom != "" && $prenom != ""){
                 $this->fpdf->Line($c1, $w, $c3, $w);
                 $this->fpdf->SetFont('Arial', '', 10);
-                $nomEncoded = mb_convert_encoding(mb_strtoupper($nom, 'ISO-8859-1'), 'ISO-8859-1', 'UTF-8');
                 $fonctionEncoded = mb_convert_encoding($fonction, 'ISO-8859-1', 'UTF-8');
-                $this->fpdf->Text($c1 + 3, $w - 6, mb_convert_encoding($animateur['civilite'], 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding($prenom, 'ISO-8859-1', 'UTF-8') . " " . $nomEncoded);
+                $nomUpper = mb_strtoupper($nom, 'ISO-8859-1');
+                $this->fpdf->Text($c1 + 3, $w - 6, mb_convert_encoding($animateur['civilite'], 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding($prenom, 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding($nomUpper, 'ISO-8859-1', 'UTF-8'));
                 $this->fpdf->SetFont('Arial', '', 8);
                 $this->fpdf->Text($c1 + 3, $w - 1, $fonctionEncoded);
                 $w += 12;
             }
         }
-        // Ligne vide après les animateurs
+// Ligne vide après les animateurs
         $this->fpdf->Line($c1, $w, $c3, $w);
-        $this->fpdf->Text($c1 + 3, $w - 6, '');
+        $this->fpdf->SetFont('Arial', '', 10);
+        $this->fpdf->Text($c1 + 30, $w - 5, 'Participants');
         $w += 12;
 
+        foreach ($personnes['participants'] as $participant) {
+
+                $nom = str_replace("\\'", "'", $participant['nom']); //stripslashes
+                $prenom = str_replace("\\'", "'", $participant['prenom']);
+                $fonction = str_replace("\\'", "'", $participant['service'] . " - " . $participant['fonction']);
+
+                if ($nom != "" && $prenom != "") {
+                    $this->fpdf->Line($c1, $w, $c3, $w);
+                    $this->fpdf->SetFont('Arial', '', 10);
+                    $nomEncoded = mb_convert_encoding(mb_strtoupper($nom, 'ISO-8859-1'), 'ISO-8859-1', 'UTF-8');
+                    $fonctionEncoded = mb_convert_encoding($fonction, 'ISO-8859-1', 'UTF-8');
+                    $this->fpdf->Text($c1 + 3, $w - 6, mb_convert_encoding($participant['civilite'], 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding($prenom, 'ISO-8859-1', 'UTF-8') . " " . $nomEncoded);
+                    $this->fpdf->SetFont('Arial', '', 8);
+                    $this->fpdf->Text($c1 + 3, $w - 1, $fonctionEncoded);
+                    $w += 12;
+                    }
+
+
+                    if  ($w >= 283) {
+                            $this->fpdf->AddPage();
+                            // Réinitialiser la position verticale
+                            $w = 45;
+                        // Réinitialiser le nombre de participants sur la page
+                        // Incrémenter le numéro de page
+                        $nb_page++;
+                        $this->fpdf->SetFont('Arial', '', 10);
+                        $this->fpdf->Text($c2 + 3, 285, "Page : " . $nb_page);
+
+                    }
+                }
+        $this->fpdf->Line($c1, $w, $c1, 10); // Ligne verticale gauche page 2
+        $this->fpdf->Line( 155, $w, 155, 10,); // Ligne verticale milieu page 2
+        $this->fpdf->Line( 205, $w, 205, 10); // Ligne verticale droite page 2
+        $this->fpdf->Line($c1, $w, $c3, $w);
         // Retourner le contenu du PDF sous forme de chaîne
         return $this->fpdf->Output('S');
     }
+
 
     public function getCurrentPosY(): int
     {

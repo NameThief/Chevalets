@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\ChevaletPDFMaker;
 use App\Service\EmargementPDFMaker;
+use PhpOffice\PhpWord\PhpWord;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,7 +95,6 @@ class UploadController extends AbstractController
                     $worksheet = $spreadsheet->getSheetByName($sheetName);
                     $highestRow = $worksheet->getHighestDataRow();
 
-
                     // Extraction des données selon la feuille de calcul
                     switch ($sheetName) {
 
@@ -114,14 +114,16 @@ class UploadController extends AbstractController
                         break;
 
                         case "Participants":
+                            $nbParticipants = 0;
                             for ($row = 2; $row <= $highestRow; $row++) {
                             // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
                             if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
-                                $personnes['participants']['noms'][] = $worksheet->getCell('B' . $row)->getValue();
-                                $personnes['participants']['prenoms'][] = $worksheet->getCell('C' . $row)->getValue();
-                                $personnes['participants']['fonctions'][] = $worksheet->getCell('E' . $row)->getValue();
-                                $personnes['participants']['civilites'][] = $worksheet->getCell('A' . $row)->getValue();
-                                $personnes['participants']['services'][] = $worksheet->getCell('D' . $row)->getValue();
+                                $personnes['participants'][$nbParticipants]['nom'] = $worksheet->getCell('B' . $row)->getValue();
+                                $personnes['participants'][$nbParticipants]['prenom'] = $worksheet->getCell('C' . $row)->getValue();
+                                $personnes['participants'][$nbParticipants]['fonction'] = $worksheet->getCell('E' . $row)->getValue();
+                                $personnes['participants'][$nbParticipants]['civilite'] = $worksheet->getCell('A' . $row)->getValue();
+                                $personnes['participants'][$nbParticipants]['service'] = $worksheet->getCell('D' . $row)->getValue();
+                                $nbParticipants++;
                             }
                         }
                         break;
@@ -162,6 +164,80 @@ class UploadController extends AbstractController
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="emargement.pdf"'
                 ]);
+            } elseif ($data['document'] == 'compte_rendu') {
+                // COPIER COLLER DU CR.PHP DE L'ANCIENNE APPLICATION
+                // createSection est une fonction dépreciée par exemple
+                // + remplacer les variables $rd $rhf $rt etc
+                // $rt = objet de la réunion, $rd = date de réunion
+                $PHPWord = new PHPWord();
+
+                // New portrait section
+                $section = $PHPWord->addSection();
+                $excelFilePath = $data['fichier']->getPathname();
+
+                // Charger le fichier Excel
+                $reader = IOFactory::createReader('Xls'); // ou Xlsx selon le format du fichier Excel
+                $spreadsheet = $reader->load($excelFilePath);
+                // On définit les variables
+                $sheetNames = ["Animateurs", "Participants", "Informations", "Ordres du jour", "Objectifs"];
+                $titre = $date = $hfin = $hdebut = $objectif = $ordredujour = '';
+                $personnes = [];
+                $personnes['Animateurs'] = [];
+                $personnes['Participants'] = [];
+
+                // Add text elements
+                $section->addImage('../public/assets/img/logo-ac-bx-fd-blc-2014.jpg', array('width'=>100, 'height'=>125, 'align'=>'left'));
+                $section->addText('Bordeaux le '.$date,array(),array('align'=>'right'));
+
+                $section->addText($titre, array('bold'=>true, 'size'=>16),array('align'=>'center'));
+                $section->addText('Compte rendu de la réunion du '.$date.' (de '.$hdebut.' à '.$hfin.')', array('bold'=>true, 'size'=>12),array('align'=>'center'));
+
+                $section->addTextBreak(1);
+                $section->addText('Étaient présents :',array('bold'=>true,'underline'=> 'single'));
+                $section->addText('  Animateurs :',array('bold'=>true,'italic'=>true));
+
+                foreach ($animateurs as $personne) {
+                    $section->addText('    - '.$personne.'.');
+                }
+                $section->addText('  Participants :',array('bold'=>true,'italic'=>true));
+                foreach ($participants as $personne) {
+                    $section->addText('    - '.$personne.'.');
+                }
+                $section->addTextBreak(1);
+                $section->addText('Étaient absents :',array('bold'=>true,'underline'=> 'single'));
+                $section->addTextBreak(1);
+                $section->addText('Étaient excusés :',array('bold'=>true,'underline'=> 'single'));
+                $section->addTextBreak(1);
+
+                $section->addText('  Objectifs :',array('bold'=>true,'italic'=>true));
+                $j=1;
+                foreach ($objectifs as $objectif) {
+                    $section->addText('   '.$j.' '.$objectif);
+                    $j++;
+                }
+                $section->addTextBreak(1);
+                $section->addText('   '.$j.' Ordre du jour',array('bold'=>true,'italic'=>true));
+                $k=1;
+                foreach ($ordredujour as $odj) {
+                    $section->addText('  - '.$j.'.'.$k.' '.$odj);
+                    $k++;
+                }
+                $section->addTextBreak(1);
+
+                $fileName = 'CR.docx';
+                $PHPWord->save($fileName, 'Word2007');
+                readfile($fileName);
+                unlink($fileName);
+                // $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007'); => Ancienne ligne corrigée
+                //$objWriter->save('tmp/CR.docx');
+                //header("location:tmp/CR.docx");
+//                $temp_file = tempnam(sys_get_temp_dir(), 'CompteRendu');
+//                $objWriter->save($temp_file);
+                header('Content-Type: application/vnd.ms-word');
+                header('Content-Transfer-Encoding: binary');
+                header("Content-Disposition: attachment; filename=CompteRendu.docx");
+
+//                unlink($temp_file);
             }
         }
 
