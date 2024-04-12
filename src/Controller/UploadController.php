@@ -87,10 +87,14 @@ class UploadController extends AbstractController
                 $spreadsheet = $reader->load($excelFilePath);
                 // On définit les variables
                 $sheetNames = ["Animateurs", "Participants", "Informations", "Ordres du jour", "Objectifs"];
-                $titre = $date = $hfin = $hdebut = $objectif = $ordredujour = '';
+                $titre = $date = $hfin = $hdebut = '';
                 $personnes = [];
                 $personnes['Animateurs'] = [];
                 $personnes['Participants'] = [];
+                $animateurs = [];
+                $participants= [];
+                $objectifs = [];
+                $ordredujour = [];
 
                 // Add text elements
                 $section->addImage('../public/assets/img/logo-ac-bx-fd-blc-2014.jpg', array('width'=>100, 'height'=>125, 'align'=>'left'));
@@ -133,16 +137,19 @@ class UploadController extends AbstractController
 
                 $fileName = 'CR.docx';
                 $PHPWord->save($fileName, 'Word2007');
-                readfile($fileName);
-                unlink($fileName);
                 // $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007'); => Ancienne ligne corrigée
                 //$objWriter->save('tmp/CR.docx');
                 //header("location:tmp/CR.docx");
 //                $temp_file = tempnam(sys_get_temp_dir(), 'CompteRendu');
 //                $objWriter->save($temp_file);
-                header('Content-Type: application/vnd.ms-word');
-                header('Content-Transfer-Encoding: binary');
-                header("Content-Disposition: attachment; filename=CompteRendu.docx");
+                $content = file_get_contents($fileName);
+                unlink($fileName);
+                return new StreamedResponse(function () use ($content) {
+                    echo $content;
+                }, 200, [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
+                ]);
 
 //                unlink($temp_file);
             }
