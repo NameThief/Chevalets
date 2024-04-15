@@ -37,12 +37,12 @@ class CompteRenduWordMaker
 
         /** @var Personne $personne */
         foreach ($this->getReunion()->getAnimateurs() as $personne) {
-            $section->addText('    - ' . $personne->getNom() . '.');
+            $section->addText('    - ' . $personne->getNom() . ' '. $personne->getPrenom()  );
         }
         $section->addText('  Participants :', array('bold' => true, 'italic' => true));
         /** @var Personne $personne */
         foreach ($this->getReunion()->getParticipants() as $personne) {
-            $section->addText('    - ' . $personne->getNom() . $personne->getService() . '.');
+            $section->addText('    - ' . $personne->getNom() . ' ' . $personne->getPrenom() . ' ' . $personne->getService());
         }
         $section->addTextBreak(1);
         $section->addText('Étaient absents :', array('bold' => true, 'underline' => 'single'));
@@ -65,7 +65,6 @@ class CompteRenduWordMaker
                 $section->addText('  - ' . $premierNumeroOrdreDuJour . '.' . $secondNumeroOrdreDuJour+1 . ' ' . $ordreDuJour);
             }
         }
-
         $section->addTextBreak(1);
 
         $this->getPhpWord()->save(self::TMPFILENAME, 'Word2007');

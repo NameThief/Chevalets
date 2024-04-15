@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Model\Chevalet;
+
+use App\Model\Personne;
 use App\Service\ChevaletPDFMaker;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +17,8 @@ class ChevaletController extends AbstractController
     #[Route('/generate-pdf', name: 'generate_pdf')]
     public function generatePdf(Request $request): Response
     {
-        $chevalet = new Chevalet();
-        $form = $this->createFormBuilder($chevalet)
+        $personne = new Personne();
+        $form = $this->createFormBuilder($personne)
             ->add('nom', TextType::class)
             ->add('prenom', TextType::class)
             ->add('fonction', TextType::class)
