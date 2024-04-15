@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Model\Emargement;
 use App\Model\Personne;
 use App\Model\Reunion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
