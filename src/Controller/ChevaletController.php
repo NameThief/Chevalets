@@ -29,7 +29,7 @@ class ChevaletController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données du formulaire
             $data = $form->getData();
-            $chevaletPDFMaker = new ChevaletPDFMaker(null);
+            $chevaletPDFMaker = new ChevaletPDFMaker();
             $chevaletPDFMaker->addChevaletToPDF($personne);
 
             // Envoyer le PDF en réponse
