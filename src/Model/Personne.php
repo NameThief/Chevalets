@@ -9,7 +9,6 @@ class Personne
     private string $fonction;
     private string $civilite;
     private string $service;
-
     private string $email;
 
     public function getNom(): string

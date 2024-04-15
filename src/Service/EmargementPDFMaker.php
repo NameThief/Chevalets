@@ -2,17 +2,20 @@
 
 namespace App\Service;
 
-use App\Model\Emargement;
 use App\Model\Personne;
+use App\Model\Reunion;
 use FPDF;
 
 class EmargementPDFMaker
 {
     private FPDF $fpdf;
 
-    public function __construct()
+    private Reunion $reunion;
+
+    public function __construct(Reunion $reunion)
     {
-        $this->fpdf = new FPDF(); // Initialisez votre objet FPDF
+        $this->fpdf = new FPDF();
+        $this->setReunion($reunion);
     }
 
     public function getOutput(): string
@@ -20,7 +23,7 @@ class EmargementPDFMaker
         return $this->fpdf->Output('S');
     }
 
-    public function generatePDF(Emargement $emargement): string
+    public function makePDF(): string
     {
         // Ajouter une nouvelle page
         $this->fpdf->AddPage();
@@ -34,7 +37,7 @@ class EmargementPDFMaker
         // Ligne horizontale haut du tableau Page 1
         $this->fpdf->Line(5, 35, 205, 35);
         $this->fpdf->SetFont('Arial', '', 14);
-        $this->fpdf->Text(80, 34, "Duree : de " . stripslashes($emargement->getHeureDebut()) . " a " . stripslashes($emargement->getHeureFin()));
+        $this->fpdf->Text(80, 34, "Duree : de " . stripslashes($this->getReunion()->getHeureDebut()) . " a " . stripslashes($this->getReunion()->getHeureFin()));
 
         // Logique pour générer le PDF des listes d'émargements
         $this->fpdf->SetFont('Arial', '', 10);
@@ -50,20 +53,20 @@ class EmargementPDFMaker
 
         $logoPath = "assets/img/logo.jpg";
         // Ajouter le titre
-        $titreEncoded = mb_convert_encoding($emargement->getObjet(), 'ISO-8859-1', 'UTF-8');
+        $titreEncoded = mb_convert_encoding($this->getReunion()->getObjet(), 'ISO-8859-1', 'UTF-8');
         $this->fpdf->SetFont('Arial', 'B', 12);
         $this->fpdf->Cell(0, 10, $titreEncoded, 0, 1, 'C');
 
         // Ajouter la date
         $this->fpdf->SetFont('Arial', '', 10);
-        $this->fpdf->Cell(0, 10, $emargement->getDate(), 0, 1, 'C');
+        $this->fpdf->Cell(0, 10, $this->getReunion()->getDate(), 0, 1, 'C');
 
         $this->fpdf->SetFont('Arial', '', 10);
         // Ajout du logo
         $this->fpdf->Image($logoPath, 4, 4, 32);
 
         /** @var Personne $animateur */
-        foreach ($emargement->getAnimateurs() as $animateur) {
+        foreach ($this->getReunion()->getAnimateurs() as $animateur) {
             $hauteur_ligne = 12;
             if ($this->fpdf->GetY() + $hauteur_ligne > 270) {
                 $this->fpdf->AddPage();
@@ -91,7 +94,7 @@ class EmargementPDFMaker
         $y += 12;
 
         /** @var Personne $participant */
-        foreach ($emargement->getParticipants() as $participant) {
+        foreach ($this->getReunion()->getParticipants() as $participant) {
             if ($this->fpdf->GetY() + $hauteur_ligne > 270) {
                 $this->fpdf->AddPage();
                 // Réinitialiser la position verticale
@@ -139,5 +142,15 @@ class EmargementPDFMaker
         }
 
         return $this->fpdf->Output('S');
+    }
+
+    public function getReunion(): Reunion
+    {
+        return $this->reunion;
+    }
+
+    public function setReunion(Reunion $reunion): void
+    {
+        $this->reunion = $reunion;
     }
 }

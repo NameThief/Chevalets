@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Model\Emargement;
-use App\Model\Personne;
+use App\Model\Reunion;
 use App\Service\ChevaletPDFMaker;
-use App\Service\ChevaletsExcelParser;
-use App\Service\EmargementExcelParser;
+use App\Service\CompteRenduWordMaker;
 use App\Service\EmargementPDFMaker;
-use App\Service\WordReader;
+use App\Service\ExcelParser;
 use PhpOffice\PhpWord\PhpWord;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -16,7 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Model\Chevalet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -42,12 +39,14 @@ class UploadController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
+            $reunion = new Reunion();
+            $excelParser = new ExcelParser();
+            $excelParser->setExcelFilePath($data['fichier']->getPathname());
+            $excelParser->parse($reunion);
+
             if ($data['document'] == 'chevalets') {
-                // Créer un objet de type ChevaletPDFMaker
-                $chevaletPDFMaker = new ChevaletPDFMaker();
-                $chevaletsExcelParser = new ChevaletsExcelParser();
-                $chevaletsExcelParser->setExcelFilePath($data['fichier']->getPathname());
-                $chevaletsExcelParser->parseFile($chevaletPDFMaker);
+                $chevaletPDFMaker = new ChevaletPDFMaker($reunion);
+                $chevaletPDFMaker->makePdf();
                 $content = $chevaletPDFMaker->getOutput();
                 return new StreamedResponse(function () use ($content) {
                     echo $content;
@@ -56,14 +55,10 @@ class UploadController extends AbstractController
                     'Content-Disposition' => 'attachment; filename="chevalets.pdf"'
                 ]);
             } elseif ($data['document'] == 'emargement') {
-                $emargement = new Emargement();
-                $emargementPDFMaker = new EmargementPDFMaker();
-                $emargementExcelParser = new EmargementExcelParser();
-                $emargementExcelParser->setExcelFilePath($data['fichier']->getPathname());
-                $emargementExcelParser->parse($emargement);
+                $emargementPDFMaker = new EmargementPDFMaker($reunion);
 
                 // Appel de la méthode generatePDF avec les données extraites
-                $content = $emargementPDFMaker->generatePDF($emargement);
+                $content = $emargementPDFMaker->makePDF();
 
                 // Générer le PDF et le renvoyer en réponse
                 return new StreamedResponse(function () use ($content) {
@@ -73,103 +68,15 @@ class UploadController extends AbstractController
                     'Content-Disposition' => 'attachment; filename="emargement.pdf"'
                 ]);
             } elseif ($data['document'] == 'compte_rendu') {
-                // COPIER COLLER DU CR.PHP DE L'ANCIENNE APPLICATION
-                // createSection est une fonction dépreciée par exemple
-                // + remplacer les variables $rd $rhf $rt etc
-                // $rt = objet de la réunion, $rd = date de réunion
-                $PHPWord = new PHPWord();
-                $wordReader = new WordReader();
-                $wordContent = $wordReader->generateWordDocument();
-                $response = new Response($wordContent);
+                $compteRenduWordMaker = new CompteRenduWordMaker($reunion);
+                $content = $compteRenduWordMaker->makeWord();
 
-
-                // New portrait section
-                $section = $PHPWord->addSection();
-                $excelFilePath = $data['fichier']->getPathname();
-
-                // Charger le fichier Excel
-                $reader = IOFactory::createReader('Xls'); // ou Xlsx selon le format du fichier Excel
-                $spreadsheet = $reader->load($excelFilePath);
-
-                $sheetNames = $spreadsheet->getSheetNames();
-
-                foreach ($sheetNames as $sheetName) {
-                    // Charger la feuille Excel
-                    $spreadsheet->setActiveSheetIndexByName($sheetName);
-                    $sheet = $spreadsheet->getActiveSheet();
-                    // On définit les variables
-                    $sheetNames = $spreadsheet->getSheetNames("Animateurs", "Participants", "Informations", "Ordres du jour", "Objectifs");
-//                $sheetNames = ["Animateurs", "Participants", "Informations", "Ordres du jour", "Objectifs"];
-                    $titre = $date = $hfin = $hdebut = '';
-                    $personnes = [];
-                    $personnes['Animateurs'] = [$data];
-                    $personnes['Participants'] = [$data];
-                    $animateurs = [];
-                    $participants = [];
-                    $objectifs = [];
-                    $ordredujour = [];
-                    var_dump($objectifs);
-                    var_dump($participants);
-                    var_dump($animateurs);
-                    var_dump($personnes);
-
-                    // Add text elements
-                    $section->addImage('../public/assets/img/logo-ac-bx-fd-blc-2014.jpg', array('width' => 100, 'height' => 125, 'align' => 'left'));
-                    $section->addText('Bordeaux le ' . $date, array(), array('align' => 'right'));
-
-                    $section->addText($titre, array('bold' => true, 'size' => 16), array('align' => 'center'));
-                    $section->addText('Compte rendu de la réunion du ' . $date . ' (de ' . $hdebut . ' à ' . $hfin . ')', array('bold' => true, 'size' => 12), array('align' => 'center'));
-
-                    $section->addTextBreak(1);
-                    $section->addText('Étaient présents :', array('bold' => true, 'underline' => 'single'));
-                    $section->addText('  Animateurs :', array('bold' => true, 'italic' => true));
-
-                    foreach ($animateurs as $personne) {
-                        $section->addText('    - ' . $personne . '.');
-                    }
-                    $section->addText('  Participants :', array('bold' => true, 'italic' => true));
-                    foreach ($participants as $personne) {
-                        $section->addText('    - ' . $personne . '.');
-                    }
-                    $section->addTextBreak(1);
-                    $section->addText('Étaient absents :', array('bold' => true, 'underline' => 'single'));
-                    $section->addTextBreak(1);
-                    $section->addText('Étaient excusés :', array('bold' => true, 'underline' => 'single'));
-                    $section->addTextBreak(1);
-
-                    $section->addText('  Objectifs :', array('bold' => true, 'italic' => true));
-                    $j = 1;
-                    foreach ($objectifs as $objectif) {
-                        $section->addText('   ' . $j . ' ' . $objectif);
-                        $j++;
-                    }
-                    $section->addTextBreak(1);
-                    $section->addText('   ' . $j . ' Ordre du jour', array('bold' => true, 'italic' => true));
-                    $k = 1;
-                    foreach ($ordredujour as $odj) {
-                        $section->addText('  - ' . $j . '.' . $k . ' ' . $odj);
-                        $k++;
-                    }
-                    $section->addTextBreak(1);
-
-                    $fileName = 'CR.docx';
-                    $PHPWord->save($fileName, 'Word2007');
-                    // $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007'); => Ancienne ligne corrigée
-                    //$objWriter->save('tmp/CR.docx');
-                    //header("location:tmp/CR.docx");
-//                $temp_file = tempnam(sys_get_temp_dir(), 'CompteRendu');
-//                $objWriter->save($temp_file);
-                    $content = file_get_contents($fileName);
-                    unlink($fileName);
-                    return new StreamedResponse(function () use ($content) {
-                        echo $content;
-                    }, 200, [
-                        'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
-                    ]);
-
-//                unlink($temp_file);
-                }
+                return new StreamedResponse(function () use ($content) {
+                    echo $content;
+                }, 200, [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
+                ]);
             }
         }
         // Renvoyer le formulaire à la vue

@@ -2,15 +2,20 @@
 namespace App\Service;
 
 use App\Model\Chevalet;
+use App\Model\Personne;
+use App\Model\Reunion;
 use FPDF;
 
 class ChevaletPDFMaker
 {
     private FPDF $fpdf;
 
-    public function __construct()
+    private Reunion $reunion;
+
+    public function __construct(Reunion $reunion)
     {
         $this->fpdf = new FPDF();
+        $this->setReunion($reunion);
     }
 
     public function getOutput(): string
@@ -18,7 +23,19 @@ class ChevaletPDFMaker
         return $this->fpdf->Output('S');
     }
 
-    public function addChevaletToPDF(Chevalet $chevalet): void
+    public function makePdf(): void
+    {
+        /** @var Personne $personne */
+        foreach($this->reunion->getAnimateurs() as $personne) {
+            $this->addChevaletToPDF($personne);
+        }
+        /** @var Personne $personne */
+        foreach($this->reunion->getParticipants() as $personne) {
+            $this->addChevaletToPDF($personne);
+        }
+    }
+
+    public function addChevaletToPDF(Personne $personne): void
     {
         $this->fpdf->AddPage("L");
         $cutPath = "assets/img/cut.gif";
@@ -61,10 +78,10 @@ class ChevaletPDFMaker
         $this->fpdf->SetFont('Arial', 'B', 36);
 
         // Convertir le prénom en minuscules avec prise en charge UTF-8
-        $prenom = mb_strtolower($chevalet->getPrenom(), 'UTF-8');
+        $prenom = mb_strtolower($personne->getPrenom(), 'UTF-8');
 
         // Convertir le nom en majuscules avec prise en charge UTF-8
-        $nom = mb_strtoupper($chevalet->getNom(), 'UTF-8');
+        $nom = mb_strtoupper($personne->getNom(), 'UTF-8');
 
         // Concaténer le prénom converti avec le nom
         $prenomNom = ucwords($prenom) . ' ' . $nom;
@@ -76,7 +93,17 @@ class ChevaletPDFMaker
         $this->fpdf->SetY($this->fpdf->GetY() + 10); // Espacement vertical
 
         // Convertir la fonction avec prise en charge UTF-8
-        $fonction = mb_convert_encoding($chevalet->getFonction(), 'ISO-8859-1', 'UTF-8');
+        $fonction = mb_convert_encoding($personne->getFonction(), 'ISO-8859-1', 'UTF-8');
         $this->fpdf->Multicell(190, 10, $fonction);
+    }
+
+    public function getReunion(): Reunion
+    {
+        return $this->reunion;
+    }
+
+    public function setReunion(Reunion $reunion): void
+    {
+        $this->reunion = $reunion;
     }
 }

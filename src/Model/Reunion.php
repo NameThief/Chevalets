@@ -2,12 +2,14 @@
 
 namespace App\Model;
 
-class CompteRendu
+class Reunion
 {
     private string $objet;
     private string $date;
     private string $heureDebut;
     private string $heureFin;
+    private array $objectifs;
+    private array $ordresDuJour;
     private array $animateurs;
     private array $participants;
 
@@ -77,5 +79,36 @@ class CompteRendu
     public function addParticipant(Personne $personne) {
         $this->participants[] = $personne;
     }
+
+    public function getObjectifs(): array
+    {
+        return $this->objectifs;
+    }
+
+    public function setObjectifs(array $objectifs): void
+    {
+        $this->objectifs = $objectifs;
+    }
+
+    public function addObjectif(string $objectif): void
+    {
+        $this->objectifs[] = $objectif;
+    }
+
+    public function getOrdresDuJour(): array
+    {
+        return $this->ordresDuJour;
+    }
+
+    public function setOrdresDuJour(array $ordresDuJour): void
+    {
+        $this->ordresDuJour = $ordresDuJour;
+    }
+
+    public function addOrdreDuJour(string $ordreDuJour): void
+    {
+        $this->ordresDuJour[] = $ordreDuJour;
+    }
+
 
 }
