@@ -4,14 +4,14 @@ namespace App\Model;
 
 class Reunion
 {
-    private string $objet;
-    private string $date;
-    private string $heureDebut;
-    private string $heureFin;
-    private array $objectifs;
-    private array $ordresDuJour;
-    private array $animateurs;
-    private array $participants;
+    private string $objet = '';
+    private string $date = '';
+    private string $heureDebut = '';
+    private string $heureFin = '';
+    private array $objectifs = [];
+    private array $ordresDuJour = [];
+    private array $animateurs = [];
+    private array $participants = [];
 
     public function getObjet(): string
     {

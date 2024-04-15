@@ -51,18 +51,21 @@ class CompteRenduWordMaker
         $section->addTextBreak(1);
 
         $section->addText('  Objectifs :', array('bold' => true, 'italic' => true));
-        foreach ($this->getReunion()->getObjectifs() as $j => $objectif) {
-            $section->addText('   ' . $j+1 . ' ' . $objectif);
+        if(count($this->getReunion()->getObjectifs()) > 0) {
+            foreach ($this->getReunion()->getObjectifs() as $numeroObjectif => $objectif) {
+                $section->addText('   ' . $numeroObjectif + 1 . ' ' . $objectif);
+            }
         }
 
-        // Faire que la numérotation des ordres du jour suivent la numérotation des objectifs
-        $j += 2;
-
-        $section->addTextBreak(1);
-        $section->addText('   ' . $j . ' Ordre du jour', array('bold' => true, 'italic' => true));
-        foreach ($this->getReunion()->getOrdresDuJour() as $k => $ordreDuJour) {
-            $section->addText('  - ' . $j . '.' . $k+1 . ' ' . $ordreDuJour);
+        if(count($this->getReunion()->getOrdresDuJour()) > 0){
+            $premierNumeroOrdreDuJour = count($this->getReunion()->getObjectifs()) + 1;
+            $section->addTextBreak(1);
+            $section->addText('   ' . $premierNumeroOrdreDuJour . ' Ordre du jour', array('bold' => true, 'italic' => true));
+            foreach ($this->getReunion()->getOrdresDuJour() as $secondNumeroOrdreDuJour => $ordreDuJour) {
+                $section->addText('  - ' . $premierNumeroOrdreDuJour . '.' . $secondNumeroOrdreDuJour+1 . ' ' . $ordreDuJour);
+            }
         }
+
         $section->addTextBreak(1);
 
         $this->getPhpWord()->save(self::TMPFILENAME, 'Word2007');
