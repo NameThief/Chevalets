@@ -76,12 +76,14 @@ class Reunion
     {
         $this->participants = $participants;
     }
-    public function addParticipant(Personne $personne) {
+    public function addParticipant(Personne $personne)
+    {
         $this->participants[] = $personne;
     }
 
     public function getObjectifs(): array
     {
+
         return $this->objectifs;
     }
 

@@ -37,12 +37,12 @@ class CompteRenduWordMaker
 
         /** @var Personne $personne */
         foreach ($this->getReunion()->getAnimateurs() as $personne) {
-            $section->addText('    - ' . $personne->getNom() . '.');
+            $section->addText('    - ' . $personne->getNom() . ' '. $personne->getPrenom()  );
         }
         $section->addText('  Participants :', array('bold' => true, 'italic' => true));
         /** @var Personne $personne */
         foreach ($this->getReunion()->getParticipants() as $personne) {
-            $section->addText('    - ' . $personne->getNom() . $personne->getService() . '.');
+            $section->addText('    - ' . $personne->getNom() . ' ' . $personne->getPrenom() . ' ' . $personne->getService());
         }
         $section->addTextBreak(1);
         $section->addText('Étaient absents :', array('bold' => true, 'underline' => 'single'));
@@ -52,8 +52,9 @@ class CompteRenduWordMaker
 
         $section->addText('  Objectifs :', array('bold' => true, 'italic' => true));
         foreach ($this->getReunion()->getObjectifs() as $j => $objectif) {
-            $section->addText('   ' . $j+1 . ' ' . $objectif);
-        }
+                $section->addText('   ' . $j + 1 . ' ' . $objectif);
+            }
+
 
         // Faire que la numérotation des ordres du jour suivent la numérotation des objectifs
         $j += 2;
