@@ -7,19 +7,18 @@ use App\Service\ChevaletPDFMaker;
 use App\Service\CompteRenduWordMaker;
 use App\Service\EmargementPDFMaker;
 use App\Service\ExcelParser;
-use PhpOffice\PhpWord\PhpWord;
+use App\Service\ReleveConclusionWordMaker;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class UploadController extends AbstractController
+class DocumentsReunionController extends AbstractController
 {
-    #[Route('/upload', name: 'upload_page')]
+    #[Route('/documents-reunions', name: 'documents_reunions')]
     public function uploadPage(Request $request): Response
     {
         $form = $this->createFormBuilder()
@@ -78,9 +77,20 @@ class UploadController extends AbstractController
                     'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
                 ]);
             }
+            elseif ($data['document'] == 'releve_conclusion') {
+                $releveConclusion = new ReleveConclusionWordMaker($reunion);
+                $content = $releveConclusion->makeWord();
+
+                return new StreamedResponse(function () use ($content) {
+                    echo $content;
+                }, 200, [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
+                ]);
+            }
         }
         // Renvoyer le formulaire à la vue
-        return $this->render('upload/upload.html.twig', [
+        return $this->render('upload/documents-reunions.html.twig', [
             'form' => $form->createView(),
         ]);
     }
