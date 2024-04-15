@@ -45,8 +45,8 @@ class UploadController extends AbstractController
             $excelParser->parse($reunion);
 
             if ($data['document'] == 'chevalets') {
-                $chevaletPDFMaker = new ChevaletPDFMaker($reunion);
-                $chevaletPDFMaker->makePdf();
+                $chevaletPDFMaker = new ChevaletPDFMaker();
+                $chevaletPDFMaker->makePdfForReunion($reunion);
                 $content = $chevaletPDFMaker->getOutput();
                 return new StreamedResponse(function () use ($content) {
                     echo $content;

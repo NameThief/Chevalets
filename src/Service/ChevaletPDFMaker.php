@@ -9,12 +9,9 @@ class ChevaletPDFMaker
 {
     private FPDF $fpdf;
 
-    private Reunion $reunion;
-
-    public function __construct(Reunion $reunion)
+    public function __construct()
     {
         $this->fpdf = new FPDF();
-        $this->setReunion($reunion);
     }
 
     public function getOutput(): string
@@ -22,14 +19,14 @@ class ChevaletPDFMaker
         return $this->fpdf->Output('S');
     }
 
-    public function makePdf(): void
+    public function makePdfForReunion(Reunion $reunion): void
     {
         /** @var Personne $personne */
-        foreach($this->reunion->getAnimateurs() as $personne) {
+        foreach($reunion->getAnimateurs() as $personne) {
             $this->addChevaletToPDF($personne);
         }
         /** @var Personne $personne */
-        foreach($this->reunion->getParticipants() as $personne) {
+        foreach($reunion->getParticipants() as $personne) {
             $this->addChevaletToPDF($personne);
         }
     }
@@ -96,13 +93,4 @@ class ChevaletPDFMaker
         $this->fpdf->Multicell(190, 10, $fonction);
     }
 
-    public function getReunion(): Reunion
-    {
-        return $this->reunion;
-    }
-
-    public function setReunion(Reunion $reunion): void
-    {
-        $this->reunion = $reunion;
-    }
 }
