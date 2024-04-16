@@ -24,7 +24,7 @@ class DocumentsReunionController extends AbstractController
         $form = $this->createFormBuilder()
             ->add('fichier', FileType::class)
             ->add('document', ChoiceType::class, [
-                'attr' => ['class' => 'fr-select'],
+                'attr' => ['class' => 'fr-select', 'style' =>'width: 250px', 'autocomplete' => 'off'],
                 'label' => 'Document',
                 'label_attr' => ['class' => 'fr-label'],
                 'row_attr'=> ['class' => 'fr-select-group'],
