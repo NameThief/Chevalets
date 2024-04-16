@@ -22,9 +22,14 @@ class DocumentsReunionController extends AbstractController
     public function uploadPage(Request $request): Response
     {
         $form = $this->createFormBuilder()
-            ->add('fichier', FileType::class)
+            ->add('fichier', FileType::class, [
+                'attr' => ['class' => 'fr-upload'],
+                'label' => 'Fichier',
+                'label_attr' => ['class' => 'fr-label'],
+                'row_attr'=> ['class' => 'fr-upload-group'],
+            ])
             ->add('document', ChoiceType::class, [
-                'attr' => ['class' => 'fr-select', 'style' =>'width: 250px', 'autocomplete' => 'off'],
+                'attr' => ['class' => 'fr-select w-50'],
                 'label' => 'Document',
                 'label_attr' => ['class' => 'fr-label'],
                 'row_attr'=> ['class' => 'fr-select-group'],

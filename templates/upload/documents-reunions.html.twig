@@ -22,17 +22,12 @@
             </div>
         </div>
     </div>
-
-    <div class="col-2 col-form-label">
-        {{ form_start(form) }}
-        <div class="form-group row ">{{ form_row(form.fichier) }}</div>
-        {{ form_row(form.document) }}
-        <button type="submit" class="fr-btn">Valider</button>
-        {{ form_end(form) }}
-    </div>
-
-
-    <a class="fr-btn" href={{ path('home') }} >
+    {{ form_start(form) }}
+    {{ form_row(form.fichier) }}
+    {{ form_row(form.document) }}
+    {{ form_end(form) }}
+    <input class="fr-btn" type="submit">
+    <a class="fr-btn" href={{ path('home') }}>
         Retour à l'accueil
     </a>
 {% endblock %}
