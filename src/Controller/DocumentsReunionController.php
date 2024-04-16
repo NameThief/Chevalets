@@ -24,11 +24,16 @@ class DocumentsReunionController extends AbstractController
         $form = $this->createFormBuilder()
             ->add('fichier', FileType::class)
             ->add('document', ChoiceType::class, [
+                'attr' => ['class' => 'fr-select'],
+                'label' => 'Document',
+                'label_attr' => ['class' => 'fr-label'],
+                'row_attr'=> ['class' => 'fr-select-group'],
                 'choices' => [
                     'Chevalets pour réunions' => 'chevalets',
                     'Liste d\'émargements' => 'emargement',
                     'Compte rendu' => 'compte_rendu',
                     'Relevé de conclusion' => 'releve_conclusion'
+
                 ],
             ])
             ->getForm();
@@ -76,8 +81,7 @@ class DocumentsReunionController extends AbstractController
                     'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
                 ]);
-            }
-            elseif ($data['document'] == 'releve_conclusion') {
+            } elseif ($data['document'] == 'releve_conclusion') {
                 $releveConclusion = new ReleveConclusionWordMaker($reunion);
                 $content = $releveConclusion->makeWord();
 

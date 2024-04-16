@@ -19,9 +19,21 @@ class ChevaletController extends AbstractController
     {
         $personne = new Personne();
         $form = $this->createFormBuilder($personne)
-            ->add('nom', TextType::class)
-            ->add('prenom', TextType::class)
-            ->add('fonction', TextType::class)
+            ->add('nom', TextType::class,[
+                'attr' => ['class' => 'fr-input'],
+                'label' => 'Nom',
+                'label_attr' => ['class' => 'fr-label']
+            ])
+            ->add('prenom', TextType::class,[
+                'attr' => ['class' => 'fr-input'],
+                'label' => 'Prénom',
+                'label_attr' => ['class' => 'fr-label']
+            ])
+            ->add('fonction', TextType::class,[
+                'attr' => ['class' => 'fr-input'],
+                'label' => 'Fonction',
+                'label_attr' => ['class' => 'fr-label']
+            ])
             ->getForm();
         $form->handleRequest($request);
 
