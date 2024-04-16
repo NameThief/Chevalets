@@ -56,7 +56,7 @@ class DocumentsReunionController extends AbstractController
                     echo $content;
                 }, 200, [
                     'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="chevalets.pdf"'
+                    'Content-Disposition' => 'attachment; filename="Chevalets.pdf"'
                 ]);
             } elseif ($data['document'] == 'emargement') {
                 $emargementPDFMaker = new EmargementPDFMaker($reunion);
@@ -69,7 +69,7 @@ class DocumentsReunionController extends AbstractController
                     echo $content;
                 }, 200, [
                     'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="emargement.pdf"'
+                    'Content-Disposition' => 'attachment; filename="Émargement.pdf"'
                 ]);
             } elseif ($data['document'] == 'compte_rendu') {
                 $compteRenduWordMaker = new CompteRenduWordMaker($reunion);
@@ -79,7 +79,7 @@ class DocumentsReunionController extends AbstractController
                     echo $content;
                 }, 200, [
                     'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
+                    'Content-Disposition' => 'attachment; filename="Compte Rendu.docx"'
                 ]);
             } elseif ($data['document'] == 'releve_conclusion') {
                 $releveConclusion = new ReleveConclusionWordMaker($reunion);
@@ -89,7 +89,7 @@ class DocumentsReunionController extends AbstractController
                     echo $content;
                 }, 200, [
                     'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'Content-Disposition' => 'attachment; filename="CompteRendu.docx"'
+                    'Content-Disposition' => 'attachment; filename="Relevé de conclusion.docx"'
                 ]);
             }
         }
