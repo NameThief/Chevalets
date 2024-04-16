@@ -42,7 +42,7 @@ class CompteRenduWordMaker
         $section->addText('  Participants :', array('bold' => true, 'italic' => true));
         /** @var Personne $personne */
         foreach ($this->getReunion()->getParticipants() as $personne) {
-            $section->addText('    - ' . $personne->getCivilite() . ' ' . $personne->getNom() . ' ' . $personne->getPrenom() . ', ' . $personne->getFonction() .', '. $personne->getService() . '.');
+            $section->addText('    - ' . $personne->getCivilite() . ' ' . mb_strtoupper($personne->getNom(), 'UTF-8') . ' ' . $personne->getPrenom() . ', ' . $personne->getFonction() .', '. $personne->getService() . '.');
         }
         $section->addTextBreak(1);
         $section->addText('Étaient absents :', array('bold' => true, 'underline' => 'single'));

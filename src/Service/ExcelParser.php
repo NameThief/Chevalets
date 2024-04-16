@@ -61,7 +61,7 @@ class ExcelParser
                         // Vérifier si les colonnes B, C et E ne sont pas vides avant d'extraire les données
                         if (!empty($worksheet->getCell('B' . $row)->getValue()) && !empty($worksheet->getCell('C' . $row)->getValue()) && !empty($worksheet->getCell('E' . $row)->getValue())) {
                             $personne = new Personne();
-                            $personne->setNom(mb_strtoupper($worksheet->getCell('B' . $row)->getValue(), 'ISO-8859-1'));
+                            $personne->setNom(mb_strtoupper($worksheet->getCell('B' . $row)->getValue(), 'UTF-8' ));
                             $personne->setPrenom($worksheet->getCell('C' . $row)->getValue());
                             $personne->setFonction($worksheet->getCell('E' . $row)->getValue());
                             $personne->setCivilite($worksheet->getCell('A' . $row)->getValue());

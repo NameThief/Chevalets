@@ -121,7 +121,7 @@ class EmargementPDFMaker
                 $this->fpdf->Line(155, $y, 155, 35,); // Ligne verticale milieu page 2
                 $this->fpdf->Line(205, $y, 205, 35); // Ligne verticale droite page 2
                 $this->fpdf->SetFont('Arial', '', 10);
-                $this->fpdf->Text($c1 + 3, $y - 6, $participant->getCivilite() . " " . mb_convert_encoding($participant->getPrenom(), 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding($participant->getNom(), 'ISO-8859-1', 'UTF-8'));
+                $this->fpdf->Text($c1 + 3, $y - 6, $participant->getCivilite() . " " . mb_convert_encoding($participant->getPrenom(), 'ISO-8859-1', 'UTF-8') . " " . mb_convert_encoding(mb_strtoupper($participant->getNom()), 'ISO-8859-1', 'UTF-8'));
                 $this->fpdf->SetFont('Arial', '', 8);
                 $this->fpdf->Text($c1 + 3, $y - 1, mb_convert_encoding($participant->getService() . ' - ' . $participant->getFonction(), 'ISO-8859-1', 'UTF-8'));
                 $y += 12;
