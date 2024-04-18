@@ -7,8 +7,8 @@
         Documents pour réunions
     </h1>
 
-    <div class="fr-card fr-enlarge-link fr-card--download">
-        <div class="fr-card__body">
+    <div class="fr-card fr-card--download">
+        <div class="fr-card__body ">
             <div class="fr-card__content">
                 <h3 class="fr-card__title">
                     <a href="{{ asset('/download/modele-reunion.xls') }}" download>
@@ -22,12 +22,15 @@
             </div>
         </div>
     </div>
-    {{ form_start(form) }}
-    {{ form_row(form.fichier) }}
-    {{ form_row(form.document) }}
-    {{ form_end(form) }}
-    <input class="fr-btn" type="submit">
-    <a class="fr-btn" href={{ path('home') }}>
+
+        {{ form_start(form) }}
+        <div class="form-group row ">{{ form_row(form.fichier) }}</div>
+        {{ form_row(form.document) }}
+    <div class="col-form-label">
+        <button type="submit" class="fr-btn">Valider</button>
+        {{ form_end(form) }}
+    <a class="fr-btn" href={{ path('home') }} >
         Retour à l'accueil
     </a>
+    </div>
 {% endblock %}
